@@ -73,7 +73,7 @@ app.post("/confirmation", async (req, res) => {
         })
 
         await transporter.sendMail({
-            from: `"No Reply" <noreply@mifac2025.id>`,
+            from: `"Annual Conference 2025" <noreply@mifac2025.id>`,
             to: user.email,
             subject: "Berhasil Registrasi Ulang!",
             replyTo: "no-reply@mifac2025.id",
@@ -86,6 +86,12 @@ app.post("/confirmation", async (req, res) => {
             <h2 style="color: white; font-size: 24px;">Hi ${user.fullname},</h2>
             <p style="color: white; font-size: 16px;">Terima kasih telah melakukan registrasi ulang</p>
             <p style="color: white; font-size: 16px;">Silahkan tunjukan email konfirmasi ini dipintu masuk</p>
+
+            <p style="color: white; font-size: 14px;">Demikian informasi yang dapat kami sampaikan. Terima kasih atas perhatiannya.</p>
+            <br>
+            <p style="color: white; font-size: 14px;">Salam Mayfiners,</p>
+            <p style="color: white; font-size: 14px;font-style: italic;"><b>Perform, Comply, Accountable</b></p>
+            <p style="color: white; font-size: 14px;">Panitia Annual Conference 2025</p>
       
             <hr style="border-color: white; margin: 20px 0;">
       
@@ -206,12 +212,14 @@ app.post("/users", async (req, res) => {
               ${bookingCode}
             </div>
 
+            <p>Mohon <b>simpan dan tunjukkan nomor registrasi</b> ini saat melakukan registrasi ulang di lokasi acara.</p>
+
             <p>Informasi lebih lanjut, silakan hubungi panitia di 082118307385.</p>
       
             <p style="color: white; font-size: 14px;">Demikian informasi yang dapat kami sampaikan. Terima kasih atas perhatiannya.</p>
             <br>
             <p style="color: white; font-size: 14px;">Salam Mayfiners,</p>
-            <p style="color: white; font-size: 14px;">Perform, Comply, Accountable</p>
+            <p style="color: white; font-size: 14px;font-style: italic;"><b>Perform, Comply, Accountable</b></p>
             <p style="color: white; font-size: 14px;">Panitia Annual Conference 2025</p>
       
             <hr style="border-color: white; margin: 20px 0;">
@@ -227,7 +235,7 @@ app.post("/users", async (req, res) => {
         };
         var data = {
             destination: getExisting.phone_number,
-            message: `Halo ${getExisting.fullname},\n\nTerima kasih telah melakukan registrasi untuk *Maybank Finance Annual Conference 2025*.\n\nBerikut adalah nomor registrasi Anda:\n*${bookingCode}*\n\nInformasi lebih lanjut, silakan hubungi panitia di\n082118307385.\n\nDemikian informasi yang dapat kami sampaikan. Terima kasih atas perhatiannya.\n\n*Salam Mayfiners,*\nPerform, Comply, Accountable\nPanitia Annual Conference 2025`,
+            message: `Halo ${getExisting.fullname},\n\nTerima kasih telah melakukan registrasi untuk *Maybank Finance Annual Conference 2025*.\n\nBerikut adalah nomor registrasi Anda:\n*${bookingCode}*\n\nMohon *simpan dan tunjukkan nomor registrasi* ini saat melakukan registrasi ulang di lokasi acara.\n\nInformasi lebih lanjut, silakan hubungi panitia di\n082118307385.\n\nDemikian informasi yang dapat kami sampaikan. Terima kasih atas perhatiannya.\n\nSalam Mayfiners,\n*_Perform, Comply, Accountable_*\nPanitia Annual Conference 2025`,
             include_unsubscribe: false,
         }
         const url = 'https://api.nusasms.com/nusasms_api/1.0/whatsapp/message'
@@ -288,12 +296,13 @@ app.post("/resend", async (req, res) => {
               ${getUser.bookingCode}
             </div>
 
+            <p>Mohon <b>simpan dan tunjukkan nomor registrasi</b> ini saat melakukan registrasi ulang di lokasi acara.</p>
             <p>Informasi lebih lanjut, silakan hubungi panitia di 082118307385.</p>
       
             <p style="color: white; font-size: 14px;">Demikian informasi yang dapat kami sampaikan. Terima kasih atas perhatiannya.</p>
             <br>
             <p style="color: white; font-size: 14px;">Salam Mayfiners,</p>
-            <p style="color: white; font-size: 14px;">Perform, Comply, Accountable</p>
+            <p style="color: white; font-size: 14px;font-style: italic;"><b>Perform, Comply, Accountable</b></p>
             <p style="color: white; font-size: 14px;">Panitia Annual Conference 2025</p>
       
             <hr style="border-color: white; margin: 20px 0;">
@@ -309,7 +318,7 @@ app.post("/resend", async (req, res) => {
         };
         var data = {
             destination: getExisting.phone_number,
-            message: `Halo ${getExisting.fullname},\n\nTerima kasih telah melakukan registrasi untuk *Maybank Finance Annual Conference 2025*.\n\nBerikut adalah nomor registrasi Anda:\n*${getUser.bookingCode}*\n\nInformasi lebih lanjut, silakan hubungi panitia di\n082118307385.\n\nDemikian informasi yang dapat kami sampaikan. Terima kasih atas perhatiannya.\n\n*Salam Mayfiners,*\nPerform, Comply, Accountable\nPanitia Annual Conference 2025`,
+            message: `Halo ${getExisting.fullname},\n\nTerima kasih telah melakukan registrasi untuk *Maybank Finance Annual Conference 2025*.\n\nBerikut adalah nomor registrasi Anda:\n*${getUser.bookingCode}*\n\nMohon *simpan dan tunjukkan nomor registrasi* ini saat melakukan registrasi ulang di lokasi acara.\n\nInformasi lebih lanjut, silakan hubungi panitia di\n082118307385.\n\nDemikian informasi yang dapat kami sampaikan. Terima kasih atas perhatiannya.\n\nSalam Mayfiners,\n*_Perform, Comply, Accountable_*\nPanitia Annual Conference 2025`,
             include_unsubscribe: false,
         }
         const url = 'https://api.nusasms.com/nusasms_api/1.0/whatsapp/message'
