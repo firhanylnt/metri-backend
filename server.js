@@ -198,13 +198,15 @@ app.post("/users", async (req, res) => {
               <img src="https://www.mifac2025.id/images/logo-header.jpg" alt="Logo" style="max-width: 200px;">
             </div>
             
-            <h2 style="color: white; font-size: 24px;">Welcome ${fullname}!</h2>
-            <p style="color: white; font-size: 16px;">Terima kasih telah melakukan registrasi Annual Conference 2025</p>
+            <h2 style="color: white; font-size: 24px;">Halo ${fullname},</h2>
+            <p style="color: white; font-size: 16px;">Terima kasih telah melakukan registrasi untuk <b>Maybank Finance Annual Conference 2025</b>.</p>
             <p style="color: white; font-size: 16px;">Berikut adalah nomor registrasi Anda:</p>
       
             <div style="margin: 20px auto; padding: 15px; background-color: yellow; color: black; font-size: 24px; font-weight: bold; display: inline-block; border-radius: 8px;">
               ${bookingCode}
             </div>
+
+            <p>Informasi lebih lanjut, silakan hubungi panitia di 082118307385.</p>
       
             <p style="color: white; font-size: 14px;">Demikian informasi yang dapat kami sampaikan. Terima kasih atas perhatiannya.</p>
             <br>
