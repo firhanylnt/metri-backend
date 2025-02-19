@@ -145,18 +145,16 @@ app.post("/users", async (req, res) => {
     try {
 
         const { fullname, email, npk, birthdate, phone_number, cabang, bookingCode, testimoni } = req.body;
-        console.log(birthdate);
         const getExisting = await prisma.existingUser.findFirst({
             where: { npk: Number(npk) }
         });
 
         const dateObj = new Date(birthdate);
 
-        const formattedDate = `${String(dateObj.getDate()).padStart(2, "0")}/${String(dateObj.getMonth() + 1).padStart(2, "0")}/${dateObj.getFullYear()}`;
-    
-
+        const formattedDate = `${String(dateObj.getDate())}/${String(dateObj.getMonth() + 1)}/${dateObj.getFullYear()}`;
+        
         if(!getExisting) {
-            return res.json({ success: false, error: 'NPK Not Found' });
+            return res.json({ success: false, error: 'NPK not found' });
         }
 
         const checkBirthdate = await prisma.existingUser.findFirst({
@@ -164,7 +162,7 @@ app.post("/users", async (req, res) => {
         });
 
         if(!checkBirthdate){
-            return res.json({ success: false, error: 'Tanggal Lahir tidak cocok' });
+            return res.json({ success: false, error: 'Tanggal lahir tidak cocok' });
         }
 
         const getUser = await prisma.user.findFirst({
@@ -174,7 +172,7 @@ app.post("/users", async (req, res) => {
         })
 
         if(getUser) {
-            return res.json({ success: false, error: 'Already Registered' });
+            return res.json({ success: false, error: 'Already registered' });
         }
 
         const newUser = await prisma.user.create({
@@ -190,7 +188,7 @@ app.post("/users", async (req, res) => {
         })
 
         await transporter.sendMail({
-            from: `"No Reply" <noreply@mifac2025.id>`,
+            from: `"Annual Conference 2025" <noreply@mifac2025.id>`,
             to: getExisting.email,
             subject: "Welcome to Maybank Finance Annual Conference 2025!",
             replyTo: "no-reply@mifac2025.id",
@@ -227,12 +225,10 @@ app.post("/users", async (req, res) => {
         };
         var data = {
             destination: getExisting.phone_number,
-            message: `Halo ${getExisting.fullname},\n\nTerima kasih telah melakukan registrasi *Annual Conference 2025*.\n\nBerikut adalah nomor registrasi Anda:\n*${bookingCode}*\n\nDemikian informasi yang dapat kami sampaikan. Terima kasih atas perhatiannya.\n\n*Salam Mayfiners,*\nPerform, Comply, Accountable\nPanitia Annual Conference 2025`,
+            message: `Halo ${getExisting.fullname},\n\nTerima kasih telah melakukan registrasi untuk *Maybank Finance Annual Conference 2025*.\n\nBerikut adalah nomor registrasi Anda:\n*${bookingCode}*\n\nInformasi lebih lanjut, silakan hubungi panitia di\n082118307385.\n\nDemikian informasi yang dapat kami sampaikan. Terima kasih atas perhatiannya.\n\n*Salam Mayfiners,*\nPerform, Comply, Accountable\nPanitia Annual Conference 2025`,
             include_unsubscribe: false,
         }
         const url = 'https://api.nusasms.com/nusasms_api/1.0/whatsapp/message'
-        // Test host
-        // const url = 'https://dev.nusasms.com/nusasms_api/1.0/whatsapp/message'
 
         axios.post(url, data, { headers })
             .then(response => {
@@ -248,7 +244,7 @@ app.post("/users", async (req, res) => {
                 }
             });
 
-        res.json({ success: true, message: "User created and email sent", user: newUser });
+        res.json({ success: true, message: "User created and email sent" });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
