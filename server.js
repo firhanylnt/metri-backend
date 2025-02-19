@@ -150,6 +150,10 @@ app.post("/users", async (req, res) => {
             where: { npk: Number(npk) }
         });
 
+        if(!getExisting) {
+            return res.json({ success: false, error: 'NPK Not Found' });
+        }
+
         const getUser = await prisma.user.findFirst({
             where: {
                 npk: npk,
@@ -157,7 +161,7 @@ app.post("/users", async (req, res) => {
         })
 
         if(getUser) {
-            return res.status(500).json({ success: false, error: 'NPK sudah terdaftar' });
+            return res.json({ success: false, error: 'Already Registered' });
         }
 
         const newUser = await prisma.user.create({
