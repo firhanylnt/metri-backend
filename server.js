@@ -270,7 +270,7 @@ app.post("/resend", async (req, res) => {
 
 
         await transporter.sendMail({
-            from: `"No Reply" <noreply@mifac2025.id>`,
+            from: `"Annual Conference 2025" <noreply@mifac2025.id>`,
             to: getExisting.email,
             subject: "Welcome to Maybank Finance Annual Conference 2025!",
             replyTo: "no-reply@mifac2025.id",
@@ -280,13 +280,15 @@ app.post("/resend", async (req, res) => {
               <img src="https://www.mifac2025.id/images/logo-header.jpg" alt="Logo" style="max-width: 200px;">
             </div>
             
-            <h2 style="color: white; font-size: 24px;">Welcome ${getExisting.fullname}!</h2>
-            <p style="color: white; font-size: 16px;">Terima kasih telah melakukan registrasi Annual Conference 2025</p>
+            <h2 style="color: white; font-size: 24px;">Halo ${getExisting.fullname},</h2>
+            <p style="color: white; font-size: 16px;">Terima kasih telah melakukan registrasi untuk <b>Maybank Finance Annual Conference 2025</b>.</p>
             <p style="color: white; font-size: 16px;">Berikut adalah nomor registrasi Anda:</p>
       
             <div style="margin: 20px auto; padding: 15px; background-color: yellow; color: black; font-size: 24px; font-weight: bold; display: inline-block; border-radius: 8px;">
               ${getUser.bookingCode}
             </div>
+
+            <p>Informasi lebih lanjut, silakan hubungi panitia di 082118307385.</p>
       
             <p style="color: white; font-size: 14px;">Demikian informasi yang dapat kami sampaikan. Terima kasih atas perhatiannya.</p>
             <br>
@@ -307,12 +309,10 @@ app.post("/resend", async (req, res) => {
         };
         var data = {
             destination: getExisting.phone_number,
-            message: `Halo ${getExisting.fullname},\n\nTerima kasih telah melakukan registrasi *Annual Conference 2025*.\n\nBerikut adalah nomor registrasi Anda:\n*${getUser.bookingCode}*\n\nDemikian informasi yang dapat kami sampaikan. Terima kasih atas perhatiannya.\n\n*Salam Mayfiners,*\nPerform, Comply, Accountable\nPanitia Annual Conference 2025`,
+            message: `Halo ${getExisting.fullname},\n\nTerima kasih telah melakukan registrasi untuk *Maybank Finance Annual Conference 2025*.\n\nBerikut adalah nomor registrasi Anda:\n*${getUser.bookingCode}*\n\nInformasi lebih lanjut, silakan hubungi panitia di\n082118307385.\n\nDemikian informasi yang dapat kami sampaikan. Terima kasih atas perhatiannya.\n\n*Salam Mayfiners,*\nPerform, Comply, Accountable\nPanitia Annual Conference 2025`,
             include_unsubscribe: false,
         }
         const url = 'https://api.nusasms.com/nusasms_api/1.0/whatsapp/message'
-        // Test host
-        // const url = 'https://dev.nusasms.com/nusasms_api/1.0/whatsapp/message'
 
         axios.post(url, data, { headers })
             .then(response => {
