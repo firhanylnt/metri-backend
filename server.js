@@ -145,13 +145,26 @@ app.post("/users", async (req, res) => {
     try {
 
         const { fullname, email, npk, birthdate, phone_number, cabang, bookingCode, testimoni } = req.body;
-
+        console.log(birthdate);
         const getExisting = await prisma.existingUser.findFirst({
             where: { npk: Number(npk) }
         });
 
+        const dateObj = new Date(birthdate);
+
+        const formattedDate = `${String(dateObj.getDate()).padStart(2, "0")}/${String(dateObj.getMonth() + 1).padStart(2, "0")}/${dateObj.getFullYear()}`;
+    
+
         if(!getExisting) {
             return res.json({ success: false, error: 'NPK Not Found' });
+        }
+
+        const checkBirthdate = await prisma.existingUser.findFirst({
+            where: { birthday: formattedDate }
+        });
+
+        if(!checkBirthdate){
+            return res.json({ success: false, error: 'Tanggal Lahir tidak cocok' });
         }
 
         const getUser = await prisma.user.findFirst({
