@@ -37,10 +37,10 @@ app.post("/existing", async (req, res) => {
 
 })
 
-app.get("/total", async(req, res) => {
+app.get("/total", async (req, res) => {
     try {
         const registered = await prisma.user.count();
-        const confirm = await prisma.user.count({where: {status: true}});
+        const confirm = await prisma.user.count({ where: { status: true } });
 
         res.json({
             success: true,
@@ -59,8 +59,8 @@ app.post("/confirmation", async (req, res) => {
 
         const { npk } = req.body;
 
-        const user = await prisma.user.findFirst({
-            where: { npk: npk }
+        const user = await prisma.existingUser.findFirst({
+            where: { npk: Number(npk) }
         })
 
         await prisma.user.update({
@@ -70,35 +70,66 @@ app.post("/confirmation", async (req, res) => {
             data: {
                 status: true,
             }
-        })
-
-        await transporter.sendMail({
-            from: `"Annual Conference 2025" <noreply@mifac2025.id>`,
-            to: user.email,
-            subject: "Berhasil Registrasi Ulang!",
-            replyTo: "no-reply@mifac2025.id",
-            html: `
-          <div style="background-color: black; padding: 20px; text-align: center; color: white; font-family: Arial, sans-serif;">
-            <div style="margin-bottom: 20px;">
-              <img src="https://www.mifac2025.id/images/logo-header.jpg" alt="Logo" style="max-width: 200px;">
-            </div>
-            
-            <h2 style="color: white; font-size: 24px;">Hi ${user.fullname},</h2>
-            <p style="color: white; font-size: 16px;">Terima kasih telah melakukan registrasi ulang</p>
-            <p style="color: white; font-size: 16px;">Silahkan tunjukan email konfirmasi ini dipintu masuk</p>
-
-            <p style="color: white; font-size: 14px;">Demikian informasi yang dapat kami sampaikan. Terima kasih atas perhatiannya.</p>
-            <br>
-            <p style="color: white; font-size: 14px;">Salam Mayfiners,</p>
-            <p style="color: white; font-size: 14px;font-style: italic;"><b>Perform, Comply, Accountable</b></p>
-            <p style="color: white; font-size: 14px;">Panitia Annual Conference 2025</p>
-      
-            <hr style="border-color: white; margin: 20px 0;">
-      
-            <p style="color: gray; font-size: 12px;">This is an automated email, please do not reply.</p>
-          </div>
-        `,
         });
+
+        try {
+
+            await transporter.sendMail({
+                from: `"Annual Conference 2025" <noreply@mifac2025.id>`,
+                to: user.email,
+                subject: "Berhasil Registrasi Ulang!",
+                replyTo: "no-reply@mifac2025.id",
+                html: `
+              <div style="background-color: black; padding: 20px; text-align: center; color: white; font-family: Arial, sans-serif;">
+                <div style="margin-bottom: 20px;">
+                  <img src="https://www.mifac2025.id/images/logo-header.jpg" alt="Logo" style="max-width: 200px;">
+                </div>
+                
+                <h2 style="color: white; font-size: 24px;">Hi ${user.fullname},</h2>
+                <p style="color: white; font-size: 16px;">Terima kasih telah melakukan registrasi ulang</p>
+                <p style="color: white; font-size: 16px;">Silahkan tunjukan email konfirmasi ini dipintu masuk</p>
+    
+                <p style="color: white; font-size: 14px;">Demikian informasi yang dapat kami sampaikan. Terima kasih atas perhatiannya.</p>
+                <br>
+                <p style="color: white; font-size: 14px;">Salam Mayfiners,</p>
+                <p style="color: white; font-size: 14px;font-style: italic;"><b>Perform, Comply, Accountable</b></p>
+                <p style="color: white; font-size: 14px;">Panitia Annual Conference 2025</p>
+          
+                <hr style="border-color: white; margin: 20px 0;">
+          
+                <p style="color: gray; font-size: 12px;">This is an automated email, please do not reply.</p>
+              </div>
+            `,
+            });
+            
+        } catch (error) {
+            console.log(error)
+        }
+
+        // const headers = {
+        //     Accept: 'application/json',
+        //     APIKey: '476F76380BD0991521AAF054AB92BD73'
+        // };
+        // var data = {
+        //     destination: user.phone_number,
+        //     message: `Halo ${user.fullname},\n\nTerima kasih telah melakukan registrasi ulang *Maybank Finance Annual Conference 2025*.\n\nSilahkan tunjukan pesan konfirmasi ini dipintu masuk\n\nDemikian informasi yang dapat kami sampaikan. Terima kasih atas perhatiannya.\n\nSalam Mayfiners,\n*_Perform, Comply, Accountable_*\nPanitia Annual Conference 2025`,
+        //     include_unsubscribe: false,
+        // }
+        // const url = 'https://api.nusasms.com/nusasms_api/1.0/whatsapp/message'
+
+        // axios.post(url, data, { headers })
+        //     .then(response => {
+        //         console.log(response.data)
+        //     })
+        //     .catch(error => {
+        //         if (error.response) {
+        //             console.error(error.response.data)
+        //         } else if (error.request) {
+        //             console.error(error.request)
+        //         } else {
+        //             console.error(error.message);
+        //         }
+        //     });
 
         res.json({
             success: true,
@@ -155,11 +186,13 @@ app.post("/users", async (req, res) => {
             where: { npk: Number(npk) }
         });
 
+
+
         const dateObj = new Date(birthdate);
 
         const formattedDate = `${String(dateObj.getDate())}/${String(dateObj.getMonth() + 1)}/${dateObj.getFullYear()}`;
-        
-        if(!getExisting) {
+        console.log(formattedDate);
+        if (!getExisting) {
             return res.json({ success: false, error: 'NPK not found' });
         }
 
@@ -167,7 +200,7 @@ app.post("/users", async (req, res) => {
             where: { birthday: formattedDate }
         });
 
-        if(!checkBirthdate){
+        if (!checkBirthdate) {
             return res.json({ success: false, error: 'Tanggal lahir tidak cocok' });
         }
 
@@ -177,12 +210,12 @@ app.post("/users", async (req, res) => {
             }
         })
 
-        if(getUser) {
+        if (getUser) {
             return res.json({ success: false, error: 'Already registered' });
         }
 
         const newUser = await prisma.user.create({
-            data: { fullname, email, npk, birthdate, phone_number, cabang, bookingCode },
+            data: { fullname, email, npk, birthdate: formattedDate, phone_number, cabang, bookingCode },
         });
 
         const insertTesti = await prisma.testimoni.create({
@@ -193,41 +226,45 @@ app.post("/users", async (req, res) => {
             }
         })
 
-        await transporter.sendMail({
-            from: `"Annual Conference 2025" <noreply@mifac2025.id>`,
-            to: getExisting.email,
-            subject: "Welcome to Maybank Finance Annual Conference 2025!",
-            replyTo: "no-reply@mifac2025.id",
-            html: `
-          <div style="background-color: black; padding: 20px; text-align: center; color: white; font-family: Arial, sans-serif;">
-            <div style="margin-bottom: 20px;">
-              <img src="https://www.mifac2025.id/images/logo-header.jpg" alt="Logo" style="max-width: 200px;">
-            </div>
-            
-            <h2 style="color: white; font-size: 24px;">Halo ${fullname},</h2>
-            <p style="color: white; font-size: 16px;">Terima kasih telah melakukan registrasi untuk <b>Maybank Finance Annual Conference 2025</b>.</p>
-            <p style="color: white; font-size: 16px;">Berikut adalah nomor registrasi Anda:</p>
-      
-            <div style="margin: 20px auto; padding: 15px; background-color: yellow; color: black; font-size: 24px; font-weight: bold; display: inline-block; border-radius: 8px;">
-              ${bookingCode}
-            </div>
-
-            <p>Mohon <b>simpan dan tunjukkan nomor registrasi</b> ini saat melakukan registrasi ulang di lokasi acara.</p>
-
-            <p>Informasi lebih lanjut, silakan hubungi panitia di 082118307385.</p>
-      
-            <p style="color: white; font-size: 14px;">Demikian informasi yang dapat kami sampaikan. Terima kasih atas perhatiannya.</p>
-            <br>
-            <p style="color: white; font-size: 14px;">Salam Mayfiners,</p>
-            <p style="color: white; font-size: 14px;font-style: italic;"><b>Perform, Comply, Accountable</b></p>
-            <p style="color: white; font-size: 14px;">Panitia Annual Conference 2025</p>
-      
-            <hr style="border-color: white; margin: 20px 0;">
-      
-            <p style="color: gray; font-size: 12px;">This is an automated email, please do not reply.</p>
-          </div>
-        `,
-        });
+        try {
+            await transporter.sendMail({
+                from: `"Annual Conference 2025" <noreply@mifac2025.id>`,
+                to: getExisting.email,
+                subject: "Welcome to Maybank Finance Annual Conference 2025!",
+                replyTo: "no-reply@mifac2025.id",
+                html: `
+              <div style="background-color: black; padding: 20px; text-align: center; color: white; font-family: Arial, sans-serif;">
+                <div style="margin-bottom: 20px;">
+                  <img src="https://www.mifac2025.id/images/logo-header.jpg" alt="Logo" style="max-width: 200px;">
+                </div>
+                
+                <h2 style="color: white; font-size: 24px;">Halo ${fullname},</h2>
+                <p style="color: white; font-size: 16px;">Terima kasih telah melakukan registrasi untuk <b>Maybank Finance Annual Conference 2025</b>.</p>
+                <p style="color: white; font-size: 16px;">Berikut adalah nomor registrasi Anda:</p>
+          
+                <div style="margin: 20px auto; padding: 15px; background-color: yellow; color: black; font-size: 24px; font-weight: bold; display: inline-block; border-radius: 8px;">
+                  ${bookingCode}
+                </div>
+    
+                <p>Mohon <b>simpan dan tunjukkan nomor registrasi</b> ini saat melakukan registrasi ulang di lokasi acara.</p>
+    
+                <p>Informasi lebih lanjut, silakan hubungi panitia di 082118307385.</p>
+          
+                <p style="color: white; font-size: 14px;">Demikian informasi yang dapat kami sampaikan. Terima kasih atas perhatiannya.</p>
+                <br>
+                <p style="color: white; font-size: 14px;">Salam Mayfiners,</p>
+                <p style="color: white; font-size: 14px;font-style: italic;"><b>Perform, Comply, Accountable</b></p>
+                <p style="color: white; font-size: 14px;">Panitia Annual Conference 2025</p>
+          
+                <hr style="border-color: white; margin: 20px 0;">
+          
+                <p style="color: gray; font-size: 12px;">This is an automated email, please do not reply.</p>
+              </div>
+            `,
+            });
+        } catch (error) {
+            console.log(error)
+        }
 
         const headers = {
             Accept: 'application/json',
@@ -276,41 +313,44 @@ app.post("/resend", async (req, res) => {
             }
         })
 
-
-        await transporter.sendMail({
-            from: `"Annual Conference 2025" <noreply@mifac2025.id>`,
-            to: getExisting.email,
-            subject: "Welcome to Maybank Finance Annual Conference 2025!",
-            replyTo: "no-reply@mifac2025.id",
-            html: `
-          <div style="background-color: black; padding: 20px; text-align: center; color: white; font-family: Arial, sans-serif;">
-            <div style="margin-bottom: 20px;">
-              <img src="https://www.mifac2025.id/images/logo-header.jpg" alt="Logo" style="max-width: 200px;">
-            </div>
-            
-            <h2 style="color: white; font-size: 24px;">Halo ${getExisting.fullname},</h2>
-            <p style="color: white; font-size: 16px;">Terima kasih telah melakukan registrasi untuk <b>Maybank Finance Annual Conference 2025</b>.</p>
-            <p style="color: white; font-size: 16px;">Berikut adalah nomor registrasi Anda:</p>
-      
-            <div style="margin: 20px auto; padding: 15px; background-color: yellow; color: black; font-size: 24px; font-weight: bold; display: inline-block; border-radius: 8px;">
-              ${getUser.bookingCode}
-            </div>
-
-            <p>Mohon <b>simpan dan tunjukkan nomor registrasi</b> ini saat melakukan registrasi ulang di lokasi acara.</p>
-            <p>Informasi lebih lanjut, silakan hubungi panitia di 082118307385.</p>
-      
-            <p style="color: white; font-size: 14px;">Demikian informasi yang dapat kami sampaikan. Terima kasih atas perhatiannya.</p>
-            <br>
-            <p style="color: white; font-size: 14px;">Salam Mayfiners,</p>
-            <p style="color: white; font-size: 14px;font-style: italic;"><b>Perform, Comply, Accountable</b></p>
-            <p style="color: white; font-size: 14px;">Panitia Annual Conference 2025</p>
-      
-            <hr style="border-color: white; margin: 20px 0;">
-      
-            <p style="color: gray; font-size: 12px;">This is an automated email, please do not reply.</p>
-          </div>
-        `,
-        });
+        try {
+            await transporter.sendMail({
+                from: `"Annual Conference 2025" <noreply@mifac2025.id>`,
+                to: getExisting.email,
+                subject: "Welcome to Maybank Finance Annual Conference 2025!",
+                replyTo: "no-reply@mifac2025.id",
+                html: `
+              <div style="background-color: black; padding: 20px; text-align: center; color: white; font-family: Arial, sans-serif;">
+                <div style="margin-bottom: 20px;">
+                  <img src="https://www.mifac2025.id/images/logo-header.jpg" alt="Logo" style="max-width: 200px;">
+                </div>
+                
+                <h2 style="color: white; font-size: 24px;">Halo ${getExisting.fullname},</h2>
+                <p style="color: white; font-size: 16px;">Terima kasih telah melakukan registrasi untuk <b>Maybank Finance Annual Conference 2025</b>.</p>
+                <p style="color: white; font-size: 16px;">Berikut adalah nomor registrasi Anda:</p>
+          
+                <div style="margin: 20px auto; padding: 15px; background-color: yellow; color: black; font-size: 24px; font-weight: bold; display: inline-block; border-radius: 8px;">
+                  ${getUser.bookingCode}
+                </div>
+    
+                <p>Mohon <b>simpan dan tunjukkan nomor registrasi</b> ini saat melakukan registrasi ulang di lokasi acara.</p>
+                <p>Informasi lebih lanjut, silakan hubungi panitia di 082118307385.</p>
+          
+                <p style="color: white; font-size: 14px;">Demikian informasi yang dapat kami sampaikan. Terima kasih atas perhatiannya.</p>
+                <br>
+                <p style="color: white; font-size: 14px;">Salam Mayfiners,</p>
+                <p style="color: white; font-size: 14px;font-style: italic;"><b>Perform, Comply, Accountable</b></p>
+                <p style="color: white; font-size: 14px;">Panitia Annual Conference 2025</p>
+          
+                <hr style="border-color: white; margin: 20px 0;">
+          
+                <p style="color: gray; font-size: 12px;">This is an automated email, please do not reply.</p>
+              </div>
+            `,
+            });
+        } catch (error) {
+            console.log(error)
+        }
 
         const headers = {
             Accept: 'application/json',
