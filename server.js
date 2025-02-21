@@ -143,9 +143,14 @@ app.post("/confirmation", async (req, res) => {
 app.get("/testi", async (req, res) => {
     try {
 
-        const testi = await prisma.testimoni.findMany(
-            { orderBy: { id: 'desc' } }
-        )
+        const testi = await prisma.testimoni.findMany({
+            where: {
+                id: {
+                    in: [4, 10, 11, 13, 14, 16, 17, 20, 26, 28, 31, 36, 40, 43, 45, 56, 64, 78, 86, 87]
+                }
+            },
+            orderBy: { id: 'desc' }
+        });
 
         res.json({
             success: true,
