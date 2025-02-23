@@ -4,6 +4,7 @@ const axios = require('axios');
 const cors = require("cors");
 const { PrismaClient } = require("@prisma/client");
 const nodemailer = require("nodemailer");
+const fs = require("fs");
 
 const app = express();
 const prisma = new PrismaClient();
@@ -18,6 +19,7 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASS,
     },
 });
+
 
 app.post("/existing", async (req, res) => {
     try {
@@ -36,6 +38,100 @@ app.post("/existing", async (req, res) => {
     }
 
 })
+
+app.get("/byemail", async(req, res) => {
+    const {email , code } = req.body;
+    const getExisting = await prisma.existingUser.findFirst({
+        where: { email: email}
+    });
+    const getUser = await prisma.user.findFirst({
+        where: { email: String(getExisting.email) }
+    });
+
+    if(getUser){
+        res.json({
+            success: false,
+        })
+    }
+    else{
+        const newUser = await prisma.user.create({
+            data: {
+                fullname: getExisting.fullname,
+                email: getExisting.email,
+                npk: String(getExisting.npk),
+                birthdate: getExisting.birthday,
+                phone_number: getExisting.phone_number,
+                cabang: getExisting.cabang,
+                bookingCode: code,
+            },
+        });
+        res.json({
+            success: true,
+        })
+    }
+    
+});
+
+app.get("/reinsert", async (req, res) => {
+    const data = JSON.parse(fs.readFileSync("realdata.json", "utf8"));
+    // let i = 0;
+    // let x = 0;
+    // for (let index = 0; index < data.length; index++) {
+    //     const getUser = await prisma.user.findFirst({
+    //         where: { bookingCode: String(data[index].registration_code) }
+    //     });
+    
+    //     if(getUser){
+    //         i++
+    //     }else{
+    //         const getExisting = await prisma.existingUser.findFirst({
+    //             where: { phone_number: String(data[index].rec) }
+    //         });
+    //     }
+    // }
+    
+
+
+    let i = 0;
+    let x = 0;
+    console.log(data.length)
+    for (let index = 0; index < data.length; index++) {
+        const getExisting = await prisma.existingUser.findFirst({
+            where: { phone_number: String(data[index].rec) }
+        });
+        if(getExisting){
+            i++
+        }else{
+            console.log(data[index].rec)
+        }
+
+        const getUser = await prisma.user.findFirst({
+            where: { email: String(getExisting.email) }
+        });
+
+        if(getUser){
+            x++;
+        }
+        else{
+            const newUser = await prisma.user.create({
+                data: {
+                    fullname: getExisting.fullname,
+                    email: getExisting.email,
+                    npk: String(getExisting.npk),
+                    birthdate: getExisting.birthday,
+                    phone_number: getExisting.phone_number,
+                    cabang: getExisting.cabang,
+                    bookingCode: data[index].registration_code,
+                },
+            });
+        }
+
+        
+    }
+    console.log(i)
+    console.log('-')
+    console.log(x)
+});
 
 app.get("/total", async (req, res) => {
     try {
@@ -65,7 +161,7 @@ app.post("/confirmation", async (req, res) => {
 
         await prisma.user.update({
             where: {
-                npk: npk
+                email: email
             },
             data: {
                 status: true,
@@ -188,10 +284,8 @@ app.post("/users", async (req, res) => {
 
         const { fullname, email, npk, birthdate, phone_number, cabang, bookingCode, testimoni } = req.body;
         const getExisting = await prisma.existingUser.findFirst({
-            where: { npk: Number(npk) }
+            where: { email: email }
         });
-
-
 
         const dateObj = new Date(birthdate);
 
@@ -211,7 +305,7 @@ app.post("/users", async (req, res) => {
 
         const getUser = await prisma.user.findFirst({
             where: {
-                npk: npk,
+                email: getExisting.email,
             }
         })
 
