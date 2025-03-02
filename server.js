@@ -174,7 +174,7 @@ app.post("/confirmation", async (req, res) => {
         };
         var data = {
             destination: user.phone_number,
-            message: `Halo ${user.fullname},\n\nTerima kasih telah melakukan registrasi ulang *Maybank Finance Annual Conference 2025*.\n\nSilahkan tunjukan pesan konfirmasi ini dipintu masuk\n\nDemikian informasi yang dapat kami sampaikan. Terima kasih atas perhatiannya.\n\nSalam Mayfiners,\n*_Perform, Comply, Accountable_*\nPanitia Annual Conference 2025`,
+            message: `Halo ${user.fullname},\n\nTerima kasih telah melakukan registrasi ulang *Maybank Finance Annual Conference 2025*.\n\nSilahkan tunjukan pesan konfirmasi ini di pintu masuk.\n\nDemikian informasi yang dapat kami sampaikan. Terima kasih atas perhatiannya.\n\nSalam Mayfiners,\n*_Perform, Comply, Accountable_*\nPanitia Annual Conference 2025`,
             include_unsubscribe: false,
         }
         const url = 'https://api.nusasms.com/nusasms_api/1.0/whatsapp/message'
